@@ -1,0 +1,9 @@
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\bin\Debug\OFCTloader.exe.config
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\bin\Debug\OFCTloader.exe
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\bin\Debug\OFCTloader.pdb
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Debug\OFCTloader.csprojAssemblyReference.cache
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Debug\OFCTloader.Form1.resources
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Debug\OFCTloader.Properties.Resources.resources
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Debug\OFCTloader.csproj.GenerateResource.cache
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Debug\OFCTloader.exe
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Debug\OFCTloader.pdb

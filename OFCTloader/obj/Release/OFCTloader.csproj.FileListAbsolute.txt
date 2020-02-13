@@ -1,0 +1,9 @@
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\bin\Release\OFCTloader.exe.config
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\bin\Release\OFCTloader.exe
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\bin\Release\OFCTloader.pdb
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Release\OFCTloader.csprojAssemblyReference.cache
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Release\OFCTloader.Form1.resources
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Release\OFCTloader.Properties.Resources.resources
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Release\OFCTloader.csproj.GenerateResource.cache
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Release\OFCTloader.exe
+D:\Games\OFCT\Projects\OFCTloader\OFCTloader\obj\Release\OFCTloader.pdb
