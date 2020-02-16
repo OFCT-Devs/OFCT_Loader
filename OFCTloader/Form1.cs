@@ -1,15 +1,9 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OFCTloader
@@ -21,79 +15,53 @@ namespace OFCTloader
 		readonly String bracketFileLocation = @"../braket.txt";
 		readonly String scheduleFileLocation = @"../schedule.txt";
 		readonly String streamTitleFileLocation = @"../StreamTitle.txt";
+		readonly String tournamentNameFileLocation = @"./TournamentName.txt";
 		readonly String configFileLocation = @"../OFCTloaderConfig.cfg";
+
+		public static Form1 F1;
 
 		public Form1()
 		{
 			InitializeComponent();
+			F1 = this;
 
-			Button_Set.Click += SetTextFiles;
-			Button_Init.Click += Start;
+			F1.Size = new Size(400, 340);
+			tabctrl_main.Size = new Size(347, 230);
+			tabctrl_main.Selecting += MainTabChanged;
 
-			if (File.Exists(redTeamNameFileLocation) && File.ReadAllText(redTeamNameFileLocation).Length > 0)
-			{
-				TextBox_RedTeamName.Text = File.ReadAllLines(redTeamNameFileLocation)[0];
-			}
-			else
-			{
-				File.WriteAllText(redTeamNameFileLocation, "");
-			}
+			txtbx_vs_red.TextChanged += VStitlesUpdate;
+			txtbx_vs_blue.TextChanged += VStitlesUpdate;
+			txtbx_vs_bracket.TextChanged += VStitlesUpdate;
+			txtbx_vs_code.TextChanged += VStitlesUpdate;
+			timepicker_vs_schedule.ValueChanged += VStitlesUpdate;
+			txtbx_vs_tournamentName.TextChanged += VStitlesUpdate;
 
-			if (File.Exists(blueTeamNameFileLocation) && File.ReadAllText(blueTeamNameFileLocation).Length > 0)
-			{
-				TextBox_BlueTeamName.Text = File.ReadAllLines(blueTeamNameFileLocation)[0];
-			}
-			else
-			{
-				File.WriteAllText(blueTeamNameFileLocation, "");
-			}
+			btn_vs_update.Click += VSsetTextFiles;
 
-			if (File.Exists(bracketFileLocation) && File.ReadAllText(bracketFileLocation).Length > 0)
-			{
-				TextBox_Round.Text = File.ReadAllLines(bracketFileLocation)[0];
-			}
-			else
-			{
-				File.WriteAllText(bracketFileLocation, "");
-			}
 
-			if (File.Exists(scheduleFileLocation) && File.ReadAllText(scheduleFileLocation).Length > 0)
-			{
-				TextBox_Schedule.Text = File.ReadAllLines(scheduleFileLocation)[0];
-			}
-			else
-			{
-				File.WriteAllText(scheduleFileLocation, "");
-			}
+			txtbx_showcase_bracket.TextChanged += ShowcaseTitlesUpdate;
+			txtbx_showcase_tournamentName.TextChanged += ShowcaseTitlesUpdate;
 
-			if (File.Exists(streamTitleFileLocation) && File.ReadAllText(streamTitleFileLocation).Length > 0)
-			{
-				TextBox_Title.Text = File.ReadAllLines(streamTitleFileLocation)[0];
-			}
-			else
-			{
-				File.WriteAllText(streamTitleFileLocation, "");
-			}
+			btn_showcase_update.Click += ShowcaseSetTextFiles;
 
-			if (!File.Exists(configFileLocation)){
+			btn_manual_update.Click += ManualSetTextFiles;
+
+			btn_init.Click += Start;
+
+
+			UpdateValues();
+
+			rotxtbx_showcase_streamTitle.Text = File.ReadAllLines(streamTitleFileLocation)[0];
+
+			if (!File.Exists(configFileLocation))
+			{
 				CreateSettingsFile();
 			}
 		}
 
-		void SetTextFiles(object sender, EventArgs e)
-		{
-			File.WriteAllText(redTeamNameFileLocation, TextBox_RedTeamName.Text);
-			File.WriteAllText(blueTeamNameFileLocation, TextBox_BlueTeamName.Text);
-			File.WriteAllText(bracketFileLocation, TextBox_Round.Text);
-			File.WriteAllText(scheduleFileLocation, TextBox_Schedule.Text);
-			File.WriteAllText(streamTitleFileLocation, TextBox_Title.Text);
-
-			MessageBox.Show("텍스트 파일을 업데이트했습니다.");
-		}
-
 		void Start(object sender, EventArgs e)
 		{
-			if (CheckBox_Hexchat.Checked)
+			if (chkbx_hexchat.Checked)
 			{
 				var location = ReadSettingsFile("HexchatLocation");
 				if (location == "")
@@ -109,7 +77,7 @@ namespace OFCTloader
 					MessageBox.Show("HexChat을 찾을 수 없습니다!");
 				}
 			}
-			if (CheckBox_SR.Checked)
+			if (chkbx_SR.Checked)
 			{
 				if (File.Exists("./osuStateReader.exe"))
 				{
@@ -120,7 +88,7 @@ namespace OFCTloader
 					MessageBox.Show("osu!StateReader가 없습니다!");
 				}
 			}
-			if (CheckBox_Tourney.Checked)
+			if (chkbx_tourney.Checked)
 			{
 				try
 				{
@@ -135,7 +103,7 @@ namespace OFCTloader
 					MessageBox.Show("osu!Tourney 경로가 없습니다!\nOFCTloaderConfig.cfg 파일의 osu!TourneyLocation 태그를 작성해주세요.");
 				}
 			}
-			if (CheckBox_MapPick.Checked)
+			if (chkbx_mapPick.Checked)
 			{
 				try
 				{
@@ -145,6 +113,147 @@ namespace OFCTloader
 				{
 					MessageBox.Show("mapPick.csv 파일을 찾을 수 없습니다!");
 				}
+			}
+		}
+
+
+		void VStitlesUpdate(object sender, EventArgs e)
+		{
+			rotxtbx_vs_twitchTitle.Text = txtbx_vs_tournamentName.Text + " " + txtbx_vs_bracket.Text + " : " + txtbx_vs_red.Text + " vs. " + txtbx_vs_blue.Text + " (" + txtbx_vs_code.Text + ")";
+			rotxtbx_vs_twitchAlert.Text = txtbx_vs_tournamentName.Text + " " + txtbx_vs_red.Text + " vs. " + txtbx_vs_blue.Text + " 경기가 시작되었습니다!";
+			rotxtbx_vs_discordAlert.Text = "@here " + txtbx_vs_tournamentName.Text + " " + txtbx_vs_bracket.Text + " : " + txtbx_vs_red.Text + " vs. " + txtbx_vs_blue.Text + " (" + txtbx_vs_code.Text + ")" + " 경기가 시작되었습니다!\nhttps://www.twitch.tv/ofct_official";
+		}
+
+		void VSsetTextFiles(object sender, EventArgs e)
+		{
+			File.WriteAllText(redTeamNameFileLocation, txtbx_vs_red.Text);
+			File.WriteAllText(blueTeamNameFileLocation, txtbx_vs_blue.Text);
+			File.WriteAllText(bracketFileLocation, txtbx_vs_bracket.Text + " : " + txtbx_vs_code.Text);
+			File.WriteAllText(scheduleFileLocation, timepicker_vs_schedule.Text);
+			File.WriteAllText(tournamentNameFileLocation, txtbx_vs_tournamentName.Text);
+
+			MessageBox.Show("텍스트 파일을 업데이트했습니다.\n트위치 방송 제목, 생방송 알림과 #스트리밍-알림 채널 공지해주세요!");
+
+			UpdateValues();
+		}
+
+		void ShowcaseTitlesUpdate(object sender, EventArgs e)
+		{
+			rotxtbx_showcase_streamTitle.Text = txtbx_showcase_tournamentName.Text + " " + txtbx_showcase_bracket.Text + " 맵풀 쇼케이스";
+			rotxtbx_showcase_twitchTitle.Text = txtbx_showcase_tournamentName.Text + " " + txtbx_showcase_bracket.Text + " : 맵풀 쇼케이스";
+			rotxtbx_showcase_twitchAlert.Text = txtbx_showcase_tournamentName.Text + " " + txtbx_showcase_bracket.Text + " 맵풀 쇼케이스가 시작되었습니다!";
+			rotxtbx_showcase_discordAlert.Text = "@here " + txtbx_showcase_tournamentName.Text + " " + txtbx_showcase_bracket.Text + " 맵풀 쇼케이스가 시작되었습니다!\nhttps://www.twitch.tv/ofct_official";
+		}
+
+		void ShowcaseSetTextFiles(object sender, EventArgs e)
+		{
+			File.WriteAllText(tournamentNameFileLocation, txtbx_showcase_tournamentName.Text);
+			File.WriteAllText(streamTitleFileLocation, rotxtbx_showcase_streamTitle.Text);
+
+			MessageBox.Show("텍스트 파일을 업데이트했습니다.\n트위치 방송 제목, 생방송 알림과 #스트리밍-알림 채널 공지해주세요!");
+
+			UpdateValues();
+		}
+
+		void ManualSetTextFiles(object sender, EventArgs e)
+		{
+			File.WriteAllText(redTeamNameFileLocation, txtbx_manual_red.Text);
+			File.WriteAllText(blueTeamNameFileLocation, txtbx_manual_blue.Text);
+			File.WriteAllText(bracketFileLocation, txtbx_manual_bracket.Text);
+			File.WriteAllText(scheduleFileLocation, txtbx_manual_schedule.Text);
+			File.WriteAllText(streamTitleFileLocation, txtbx_manual_streamTitle.Text);
+			File.WriteAllText(tournamentNameFileLocation, txtbx_manual_tournamentName.Text);
+
+			MessageBox.Show("텍스트 파일을 업데이트했습니다.");
+
+			UpdateValues();
+		}
+
+
+		void MainTabChanged(object sender, TabControlCancelEventArgs e)
+		{
+			if(tabctrl_main.SelectedIndex == 0)
+			{
+				F1.Size = new Size(400, 340);
+				tabctrl_main.Size = new Size(347, 230);
+			}
+			else if(tabctrl_main.SelectedIndex == 1)
+			{
+				F1.Size = new Size(540, 450);
+				tabctrl_main.Size = new Size(505, 341);
+			}
+		}
+
+		void UpdateValues()
+		{
+			if (File.Exists(redTeamNameFileLocation) && File.ReadAllText(redTeamNameFileLocation).Length > 0)
+			{
+				string redTeamName = File.ReadAllLines(redTeamNameFileLocation)[0];
+				txtbx_vs_red.Text = redTeamName;
+				txtbx_manual_red.Text = redTeamName;
+			}
+			else
+			{
+				File.WriteAllText(redTeamNameFileLocation, "");
+			}
+
+			if (File.Exists(blueTeamNameFileLocation) && File.ReadAllText(blueTeamNameFileLocation).Length > 0)
+			{
+				string blueTeamName = File.ReadAllLines(blueTeamNameFileLocation)[0];
+				txtbx_vs_blue.Text = blueTeamName;
+				txtbx_manual_blue.Text = blueTeamName;
+			}
+			else
+			{
+				File.WriteAllText(blueTeamNameFileLocation, "");
+			}
+
+			if (File.Exists(bracketFileLocation) && File.ReadAllText(bracketFileLocation).Length > 0)
+			{
+				string bracketFileValue = File.ReadAllLines(bracketFileLocation)[0];
+				txtbx_manual_bracket.Text = bracketFileValue;
+				if (bracketFileValue.Contains(" : "))
+				{
+					txtbx_vs_bracket.Text = bracketFileValue.Split(new string[] { " : " }, StringSplitOptions.None)[0];
+					txtbx_showcase_bracket.Text = bracketFileValue.Split(new string[] { " : " }, StringSplitOptions.None)[0];
+					txtbx_vs_code.Text = bracketFileValue.Split(new string[] { " : " }, StringSplitOptions.None)[1];
+				}
+			}
+			else
+			{
+				File.WriteAllText(bracketFileLocation, "");
+			}
+
+			if (File.Exists(scheduleFileLocation) && File.ReadAllText(scheduleFileLocation).Length > 0)
+			{
+				string scheduleFileValue = File.ReadAllLines(scheduleFileLocation)[0];
+				txtbx_manual_schedule.Text = scheduleFileValue;
+			}
+			else
+			{
+				File.WriteAllText(scheduleFileLocation, "");
+			}
+
+			if (File.Exists(streamTitleFileLocation) && File.ReadAllText(streamTitleFileLocation).Length > 0)
+			{
+				string streamTitle = File.ReadAllLines(streamTitleFileLocation)[0];
+				txtbx_manual_streamTitle.Text = streamTitle;
+			}
+			else
+			{
+				File.WriteAllText(streamTitleFileLocation, "");
+			}
+
+			if(File.Exists(tournamentNameFileLocation) && File.ReadAllText(tournamentNameFileLocation).Length > 0)
+			{
+				string tournamentName = File.ReadAllLines(tournamentNameFileLocation)[0];
+				txtbx_vs_tournamentName.Text = tournamentName;
+				txtbx_showcase_tournamentName.Text = tournamentName;
+				txtbx_manual_tournamentName.Text = tournamentName;
+			}
+			else
+			{
+				File.WriteAllText(tournamentNameFileLocation, "");
 			}
 		}
 
