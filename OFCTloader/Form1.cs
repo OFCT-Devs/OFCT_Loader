@@ -147,6 +147,7 @@ namespace OFCTloader
 
 		void ShowcaseSetTextFiles(object sender, EventArgs e)
 		{
+			File.WriteAllText(bracketFileLocation, txtbx_showcase_bracket.Text);
 			File.WriteAllText(tournamentNameFileLocation, txtbx_showcase_tournamentName.Text);
 			File.WriteAllText(streamTitleFileLocation, rotxtbx_showcase_streamTitle.Text);
 
